@@ -26,8 +26,12 @@ class ProductController extends Controller {
         
         $pdo = Database::connect();
         $stmt = $pdo->prepare("SELECT * FROM products WHERE name LIKE ? ORDER BY $sort $dir");
-        $stmt->execute(["%$q%"]);
-        $products = $stmt->fetchAll(\PDO::FETCH_CLASS, \App\Models\Product::class);
+                $stmt->execute(["%$q%"]);
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $products = [];
+        foreach ($rows as $row) {
+            $products[] = new \App\Models\Product($row);
+        }
         
         return view('products.index', compact('products', 'q', 'sort', 'dir'));
     }
@@ -93,3 +97,4 @@ class ProductController extends Controller {
         return redirect('/products')->with('error', 'Product not found.');
     }
 }
+
