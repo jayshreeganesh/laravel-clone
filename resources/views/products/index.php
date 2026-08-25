@@ -14,6 +14,7 @@
             <?php endif; ?>
         </div>
     </div>
+    <?php if (!empty($products) || !empty($q)): ?>
     <!-- Search Bar -->
     <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
         <form method="GET" action="/products" class="flex gap-2">
@@ -22,6 +23,7 @@
             <?php if(!empty($q)): ?><a href="/products" class="px-4 py-2 bg-slate-200 rounded-lg">Clear</a><?php endif; ?>
         </form>
     </div>
+    <?php endif; ?>
     <!-- Action Buttons -->
     <div class="px-6 pb-4 bg-slate-50 border-b border-slate-100 flex flex-wrap gap-2 justify-between items-center">
         <div class="flex gap-2">
@@ -34,9 +36,11 @@
                 </a>
             <?php endif; ?>
         </div>
+        <?php if (!empty($products) || !empty($q)): ?>
         <a href="<?= url('/products/create') ?>" class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm transition">
             <i class="fa-solid fa-plus mr-2"></i> Add Product
         </a>
+        <?php endif; ?>
     </div>
         
 
