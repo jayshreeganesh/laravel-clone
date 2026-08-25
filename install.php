@@ -40,7 +40,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $step == 2) {
 
         // Save Config
         if (!is_dir(__DIR__ . '/config')) { mkdir(__DIR__ . '/config'); }
-        $configContent = "<?php\nreturn [\n    'driver' => '$driver',\n    'host' => '$host',\n    'port' => '$port',\n    'database' => '$dbname',\n    'username' => '$user',\n    'password' => '$pass'\n];\n";
+        $configContent = "<?php
+return [
+    'default' => '$driver',
+    'connections' => [
+        'sqlite' => [
+            'driver'   => 'sqlite',
+            'database' => (defined('LARAVEL_ROOT') ? LARAVEL_ROOT : dirname(__DIR__)) . '/database/database.sqlite',
+            'prefix'   => '',
+        ],
+        'mysql' => [
+            'driver'    => 'mysql',
+            'host'      => '$host',
+            'port'      => '$port',
+            'database'  => '$dbname',
+            'username'  => '$user',
+            'password'  => '$pass',
+            'charset'   => 'utf8mb4',
+            'prefix'    => '',
+        ],
+    ],
+];
+";
         file_put_contents($configFile, $configContent);
 
         header("Location: /install.php?step=3");
