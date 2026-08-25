@@ -31,10 +31,7 @@
             <i class="fa-solid fa-code mr-2"></i> Export JSON
         </a>
     </div>
-        <a href="<?= url('/products/create') ?>" class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg shadow-sm transition">
-            <i class="fa-solid fa-plus mr-2"></i> Add Product
-        </a>
-    </div>
+        
 
     <?php if (empty($products)): ?>
         <div class="p-12 text-center">
