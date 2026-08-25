@@ -3,6 +3,7 @@
  * Laravel Clone - Front Controller
  */
 
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 define('LARAVEL_START', microtime(true));
 if (!defined('LARAVEL_ROOT')) {
     define('LARAVEL_ROOT', dirname(__DIR__));
@@ -32,3 +33,4 @@ require_once LARAVEL_ROOT . '/routes/web.php';
 
 // Dispatch Request
 App\Core\Route::dispatch();
+
