@@ -49,11 +49,19 @@
             <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
                 <i class="fa-brands fa-laravel"></i>
             </div>
-            <h3 class="text-lg font-semibold text-slate-700">No products found</h3>
-            <p class="text-slate-500 text-sm mt-1 mb-6">Create your first product using Eloquent-style syntax.</p>
-            <a href="<?= url('/products/create') ?>" class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg shadow-sm transition">
-                <i class="fa-solid fa-plus mr-2"></i> Create Product
-            </a>
+                        <?php if (!empty($q)): ?>
+                <h3 class="text-lg font-semibold text-slate-700">No results found for "<?= htmlspecialchars($q) ?>"</h3>
+                <p class="text-slate-500 text-sm mt-1 mb-6">Try adjusting your search query or clear your filters.</p>
+                <a href="/products" class="inline-flex items-center px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-medium rounded-lg shadow-sm transition">
+                    Clear Search
+                </a>
+            <?php else: ?>
+                <h3 class="text-lg font-semibold text-slate-700">No products found</h3>
+                <p class="text-slate-500 text-sm mt-1 mb-6">Create your first product to get started.</p>
+                <a href="<?= url('/products/create') ?>" class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm transition">
+                    <i class="fa-solid fa-plus mr-2"></i> Create Product
+                </a>
+            <?php endif; ?>
         </div>
     <?php else: ?>
         <div class="overflow-x-auto">
