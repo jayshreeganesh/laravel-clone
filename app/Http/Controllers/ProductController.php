@@ -1,6 +1,5 @@
 <?php
 namespace App\Http\Controllers;
-
 use App\Core\Request;
 use App\Models\Product;
 use App\Core\Database;
@@ -10,8 +9,9 @@ class ProductController extends Controller {
     public function __construct() {
         if (session_status() === PHP_SESSION_NONE) { session_start(); }
         $uri = $_SERVER['REQUEST_URI'] ?? '/';
-        // Protect routes: only index and show are public
-        if (!isset($_SESSION['user_id']) && (strpos($uri, '/create') !== false || strpos($uri, '/edit') !== false || $_SERVER['REQUEST_METHOD'] === 'POST')) {
+        
+        // TOTAL LOCKDOWN: Block everything if not logged in
+        if (!isset($_SESSION['user_id'])) {
             if ($uri !== '/login' && $uri !== '/register') {
                 header('Location: /login');
                 exit;
@@ -23,10 +23,16 @@ class ProductController extends Controller {
         $q = $_GET['q'] ?? '';
         $sort = $_GET['sort'] ?? 'id';
         $dir = $_GET['dir'] ?? 'desc';
-        
         $pdo = Database::connect();
-        $stmt = $pdo->prepare("SELECT * FROM products WHERE name LIKE ? OR sku LIKE ? OR description LIKE ? ORDER BY $sort $dir");
-                $stmt->execute(["%$q%", "%$q%", "%$q%"]);
+        
+        if (($_SESSION['role'] ?? 'user') === 'admin') {
+            $stmt = $pdo->prepare("SELECT * FROM products WHERE name LIKE ? OR sku LIKE ? OR description LIKE ? ORDER BY $sort $dir");
+            $stmt->execute(["%$q%", "%$q%", "%$q%"]);
+        } else {
+            $stmt = $pdo->prepare("SELECT * FROM products WHERE user_id = ? AND (name LIKE ? OR sku LIKE ? OR description LIKE ?) ORDER BY $sort $dir");
+            $stmt->execute([$_SESSION['user_id'], "%$q%", "%$q%", "%$q%"]);
+        }
+        
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         $products = [];
         foreach ($rows as $row) {
@@ -38,6 +44,7 @@ class ProductController extends Controller {
 
     public function show(int $id) {
         $product = Product::findOrFail($id);
+        if (($_SESSION['role'] ?? 'user') !== 'admin' && $product->user_id != $_SESSION['user_id']) { return redirect('/products'); }
         return view('products.show', compact('product'));
     }
 
@@ -53,6 +60,7 @@ class ProductController extends Controller {
         ]);
 
         Product::create([
+            'user_id'     => $_SESSION['user_id'],
             'name'        => $validated['name'],
             'sku'         => $validated['sku'],
             'price'       => (float)$validated['price'],
@@ -60,16 +68,18 @@ class ProductController extends Controller {
             'description' => $request->input('description', ''),
         ]);
 
-        return redirect('/products')->with('success', 'Product created successfully!');
+        return redirect('/products');
     }
 
     public function edit(int $id) {
         $product = Product::findOrFail($id);
+        if (($_SESSION['role'] ?? 'user') !== 'admin' && $product->user_id != $_SESSION['user_id']) { return redirect('/products'); }
         return view('products.edit', compact('product'));
     }
 
     public function update(Request $request, int $id) {
         $product = Product::findOrFail($id);
+        if (($_SESSION['role'] ?? 'user') !== 'admin' && $product->user_id != $_SESSION['user_id']) { return redirect('/products'); }
 
         $validated = $request->validate([
             'name'  => 'required',
@@ -85,16 +95,16 @@ class ProductController extends Controller {
             'description' => $request->input('description', ''),
         ]);
 
-        return redirect('/products')->with('success', 'Product updated successfully!');
+        return redirect('/products');
     }
 
     public function destroy(int $id) {
         $product = Product::find($id);
         if ($product) {
+            if (($_SESSION['role'] ?? 'user') !== 'admin' && $product->user_id != $_SESSION['user_id']) { return redirect('/products'); }
             $product->delete();
-            return redirect('/products')->with('success', 'Product deleted successfully!');
         }
-        return redirect('/products')->with('error', 'Product not found.');
+        return redirect('/products');
     }
 
     public function export() {
@@ -105,11 +115,17 @@ class ProductController extends Controller {
         }
 
         $q = $_GET['q'] ?? '';
-        $pdo = \App\Core\Database::connect();
-        $stmt = $pdo->prepare("SELECT * FROM products WHERE name LIKE ? OR sku LIKE ? OR description LIKE ? ORDER BY id DESC");
-        $stmt->execute(["%$q%", "%$q%", "%$q%"]);
+        $pdo = Database::connect();
+        
+        if (($_SESSION['role'] ?? 'user') === 'admin') {
+            $stmt = $pdo->prepare("SELECT * FROM products WHERE name LIKE ? OR sku LIKE ? OR description LIKE ? ORDER BY id DESC");
+            $stmt->execute(["%$q%", "%$q%", "%$q%"]);
+        } else {
+            $stmt = $pdo->prepare("SELECT * FROM products WHERE user_id = ? AND (name LIKE ? OR sku LIKE ? OR description LIKE ?) ORDER BY id DESC");
+            $stmt->execute([$_SESSION['user_id'], "%$q%", "%$q%", "%$q%"]);
+        }
+        
         $products = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
         $format = $_GET['format'] ?? 'csv';
 
         if ($format === 'json') {
@@ -123,9 +139,9 @@ class ProductController extends Controller {
             header('Content-Type: text/csv');
             header('Content-Disposition: attachment; filename="products.csv"');
             $output = fopen('php://output', 'w');
-            fputcsv($output, ['ID', 'Name', 'SKU', 'Description', 'Price', 'Stock']);
+            fputcsv($output, ['ID', 'User ID', 'Name', 'SKU', 'Description', 'Price', 'Stock']);
             foreach ($products as $row) {
-                fputcsv($output, [$row['id'], $row['name'], $row['sku'], $row['description'], $row['price'], $row['stock']]);
+                fputcsv($output, [$row['id'], $row['user_id'] ?? '', $row['name'], $row['sku'], $row['description'], $row['price'], $row['stock']]);
             }
             fclose($output);
             exit;
