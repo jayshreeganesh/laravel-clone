@@ -4,9 +4,26 @@
             <h1 class="text-2xl font-bold text-slate-800">Products Catalog</h1>
             <p class="text-sm text-slate-500 mt-1">Laravel-style MVC & Eloquent Active Record</p>
         </div>
+    <!-- Search Bar -->
+    <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+        <form method="GET" action="/products" class="flex gap-2">
+            <input type="text" name="q" value="<?= htmlspecialchars($q ?? '') ?>" placeholder="Search products..." class="flex-1 px-4 py-2 border rounded-lg">
+            <button type="submit" class="px-4 py-2 bg-slate-800 text-white rounded-lg">Search</button>
+            <?php if(!empty($q)): ?><a href="/products" class="px-4 py-2 bg-slate-200 rounded-lg">Clear</a><?php endif; ?>
+        </form>
+    </div>
         <a href="<?= url('/products/create') ?>" class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg shadow-sm transition">
             <i class="fa-solid fa-plus mr-2"></i> Add Product
+        </a> </a>
+        <a href="/build_zip.php" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm transition">
+            <i class="fa-solid fa-box mr-2"></i> Zip For Deploy
         </a>
+                <a href="/manage_db.php?action=seed" class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg shadow-sm transition">
+            <i class="fa-solid fa-file-arrow-down mr-2"></i> Seed JSON
+        </a>
+        <a href="/manage_db.php?action=reset" onclick="return confirm('Are you sure you want to wipe everything and reset to default?')" class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg shadow-sm transition">
+            <i class="fa-solid fa-trash mr-2"></i> Reset Data
+        </a><!-- closing original tag intentionally omitted so regex works cleanly -->
     </div>
 
     <?php if (empty($products)): ?>
@@ -26,9 +43,9 @@
                 <thead>
                     <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold uppercase text-slate-500">
                         <th class="py-3.5 px-6">ID</th>
-                        <th class="py-3.5 px-6">Product</th>
+                        <th class="py-3.5 px-6"><a href="?sort=name&dir=<?= ($sort=='name' && $dir=='asc') ? 'desc' : 'asc' ?>&q=<?= $q ?? ' ?>">Product ?</a></th>
                         <th class="py-3.5 px-6">SKU</th>
-                        <th class="py-3.5 px-6">Price</th>
+                        <th class="py-3.5 px-6"><a href="?sort=price&dir=<?= ($sort=='price' && $dir=='asc') ? 'desc' : 'asc' ?>&q=<?= $q ?? ' ?>">Price ?</a></th>
                         <th class="py-3.5 px-6">Stock</th>
                         <th class="py-3.5 px-6 text-right">Actions</th>
                     </tr>
@@ -83,3 +100,6 @@
         </div>
     <?php endif; ?>
 </div>
+
+
+
