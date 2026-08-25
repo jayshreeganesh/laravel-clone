@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-$configFile = __DIR__ . '/../config/database.php';
+$configFile = __DIR__ . '/config/database.php';
 
 // Step Routing
 $step = $_GET['step'] ?? 1;
@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $step == 2) {
 
     try {
         if ($driver === 'sqlite') {
-            $path = __DIR__ . '/../database/database.sqlite';
+            $path = __DIR__ . '/database/database.sqlite';
             if (!file_exists($path)) { touch($path); }
             $pdo = new PDO("sqlite:" . $path);
         } else {
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $step == 2) {
         $pdo->exec("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT UNIQUE, password TEXT, role TEXT DEFAULT 'user')");
 
         // Save Config
-        if (!is_dir(__DIR__ . '/../config')) { mkdir(__DIR__ . '/../config'); }
+        if (!is_dir(__DIR__ . '/config')) { mkdir(__DIR__ . '/config'); }
         $configContent = "<?php\nreturn [\n    'driver' => '$driver',\n    'host' => '$host',\n    'port' => '$port',\n    'database' => '$dbname',\n    'username' => '$user',\n    'password' => '$pass'\n];\n";
         file_put_contents($configFile, $configContent);
 
