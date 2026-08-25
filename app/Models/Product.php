@@ -7,6 +7,7 @@ class Product extends Model {
     protected string $table = 'products';
 
     protected array $fillable = [
+        'user_id',
         'name',
         'sku',
         'price',
