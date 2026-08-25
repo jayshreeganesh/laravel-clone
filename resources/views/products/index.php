@@ -34,9 +34,9 @@
                 <thead>
                     <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold uppercase text-slate-500">
                         <th class="py-3.5 px-6">ID</th>
-                        <th class="py-3.5 px-6"><a href="?sort=name&dir=<?= ($sort=='name' && $dir=='asc') ? 'desc' : 'asc' ?>&q=<?= $q ?? '' ?>">Product ?</a></th>
+                        <th class="py-3.5 px-6"><a href="?sort=name&dir=<?= ($sort=='name' && $dir=='asc') ? 'desc' : 'asc' ?>&q=<?= $q ?? '' ?>">Product <i class="fa-solid fa-sort ml-1"></i></a></th>
                         <th class="py-3.5 px-6">SKU</th>
-                        <th class="py-3.5 px-6"><a href="?sort=price&dir=<?= ($sort=='price' && $dir=='asc') ? 'desc' : 'asc' ?>&q=<?= $q ?? '' ?>">Price ?</a></th>
+                        <th class="py-3.5 px-6"><a href="?sort=price&dir=<?= ($sort=='price' && $dir=='asc') ? 'desc' : 'asc' ?>&q=<?= $q ?? '' ?>">Price <i class="fa-solid fa-sort ml-1"></i></a></th>
                         <th class="py-3.5 px-6">Stock</th>
                         <th class="py-3.5 px-6 text-right">Actions</th>
                     </tr>
