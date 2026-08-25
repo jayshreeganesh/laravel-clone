@@ -22,13 +22,20 @@
             <?php if(!empty($q)): ?><a href="/products" class="px-4 py-2 bg-slate-200 rounded-lg">Clear</a><?php endif; ?>
         </form>
     </div>
-    <!-- Export Buttons -->
-    <div class="px-6 pb-4 bg-slate-50 border-b border-slate-100 flex gap-2">
-        <a href="/products/export?format=csv&q=<?= urlencode($q ?? '') ?>" class="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg shadow-sm transition">
-            <i class="fa-solid fa-file-csv mr-2"></i> Export CSV (Excel)
-        </a>
-        <a href="/products/export?format=json&q=<?= urlencode($q ?? '') ?>" class="inline-flex items-center px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-sm font-medium rounded-lg shadow-sm transition">
-            <i class="fa-solid fa-code mr-2"></i> Export JSON
+    <!-- Action Buttons -->
+    <div class="px-6 pb-4 bg-slate-50 border-b border-slate-100 flex flex-wrap gap-2 justify-between items-center">
+        <div class="flex gap-2">
+            <?php if (!empty($products)): ?>
+                <a href="/products/export?format=csv&q=<?= urlencode($q ?? '') ?>" class="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg shadow-sm transition">
+                    <i class="fa-solid fa-file-csv mr-2"></i> Export CSV (Excel)
+                </a>
+                <a href="/products/export?format=json&q=<?= urlencode($q ?? '') ?>" class="inline-flex items-center px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-sm font-medium rounded-lg shadow-sm transition">
+                    <i class="fa-solid fa-code mr-2"></i> Export JSON
+                </a>
+            <?php endif; ?>
+        </div>
+        <a href="<?= url('/products/create') ?>" class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm transition">
+            <i class="fa-solid fa-plus mr-2"></i> Add Product
         </a>
     </div>
         
