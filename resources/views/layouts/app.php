@@ -16,12 +16,7 @@
                 <span>Laravel <span>Clone</span></span>
                 <span class="text-xs bg-white/20 text-white px-2 py-0.5 rounded-full ml-2">Low Inode</span>
             </a>
-            <div class="flex items-center space-x-4">
-                <a href="<?= url('/products') ?>" class="text-sm font-medium hover:text-red-100 transition">Products</a>
-                <a href="<?= url('/products/create') ?>" class="text-sm bg-white text-red-600 hover:bg-red-50 font-semibold px-3 py-1.5 rounded-md shadow-sm transition">
-                    <i class="fa-solid fa-plus mr-1"></i> New Product
-                </a>
-            </div>
+
         </div>
     </nav>
 
