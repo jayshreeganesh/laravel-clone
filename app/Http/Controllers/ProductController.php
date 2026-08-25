@@ -25,8 +25,8 @@ class ProductController extends Controller {
         $dir = $_GET['dir'] ?? 'desc';
         
         $pdo = Database::connect();
-        $stmt = $pdo->prepare("SELECT * FROM products WHERE name LIKE ? ORDER BY $sort $dir");
-                $stmt->execute(["%$q%"]);
+        $stmt = $pdo->prepare("SELECT * FROM products WHERE name LIKE ? OR sku LIKE ? OR description LIKE ? ORDER BY $sort $dir");
+                $stmt->execute(["%$q%", "%$q%", "%$q%"]);
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         $products = [];
         foreach ($rows as $row) {
@@ -96,5 +96,39 @@ class ProductController extends Controller {
         }
         return redirect('/products')->with('error', 'Product not found.');
     }
-}
 
+    public function export() {
+        if (session_status() === PHP_SESSION_NONE) { session_start(); }
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        $q = $_GET['q'] ?? '';
+        $pdo = \App\Core\Database::connect();
+        $stmt = $pdo->prepare("SELECT * FROM products WHERE name LIKE ? OR sku LIKE ? OR description LIKE ? ORDER BY id DESC");
+        $stmt->execute(["%$q%", "%$q%", "%$q%"]);
+        $products = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        $format = $_GET['format'] ?? 'csv';
+
+        if ($format === 'json') {
+            header('Content-Type: application/json');
+            header('Content-Disposition: attachment; filename="products.json"');
+            echo json_encode($products, JSON_PRETTY_PRINT);
+            exit;
+        }
+
+        if ($format === 'csv') {
+            header('Content-Type: text/csv');
+            header('Content-Disposition: attachment; filename="products.csv"');
+            $output = fopen('php://output', 'w');
+            fputcsv($output, ['ID', 'Name', 'SKU', 'Description', 'Price', 'Stock']);
+            foreach ($products as $row) {
+                fputcsv($output, [$row['id'], $row['name'], $row['sku'], $row['description'], $row['price'], $row['stock']]);
+            }
+            fclose($output);
+            exit;
+        }
+    }
+}
