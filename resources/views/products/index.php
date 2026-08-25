@@ -12,6 +12,14 @@
             <?php if(!empty($q)): ?><a href="/products" class="px-4 py-2 bg-slate-200 rounded-lg">Clear</a><?php endif; ?>
         </form>
     </div>
+    <!-- Search Bar -->
+    <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+        <form method="GET" action="/products" class="flex gap-2">
+            <input type="text" name="q" value="<?= htmlspecialchars($q ?? '') ?>" placeholder="Search products..." class="flex-1 px-4 py-2 border rounded-lg">
+            <button type="submit" class="px-4 py-2 bg-slate-800 text-white rounded-lg">Search</button>
+            <?php if(!empty($q)): ?><a href="/products" class="px-4 py-2 bg-slate-200 rounded-lg">Clear</a><?php endif; ?>
+        </form>
+    </div>
         <a href="<?= url('/products/create') ?>" class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg shadow-sm transition">
             <i class="fa-solid fa-plus mr-2"></i> Add Product
         </a> </a>
@@ -31,6 +39,14 @@
             <h1 class="text-2xl font-bold text-slate-800">Products Catalog</h1>
             <p class="text-sm text-slate-500 mt-1">Laravel-style MVC & Eloquent Active Record</p>
         </div>
+    <!-- Search Bar -->
+    <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+        <form method="GET" action="/products" class="flex gap-2">
+            <input type="text" name="q" value="<?= htmlspecialchars($q ?? '') ?>" placeholder="Search products..." class="flex-1 px-4 py-2 border rounded-lg">
+            <button type="submit" class="px-4 py-2 bg-slate-800 text-white rounded-lg">Search</button>
+            <?php if(!empty($q)): ?><a href="/products" class="px-4 py-2 bg-slate-200 rounded-lg">Clear</a><?php endif; ?>
+        </form>
+    </div>
     <!-- Search Bar -->
     <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
         <form method="GET" action="/products" class="flex gap-2">
@@ -137,6 +153,14 @@ SESSION['user_id'])): ?>
             <h1 class="text-2xl font-bold text-slate-800">Products Catalog</h1>
             <p class="text-sm text-slate-500 mt-1">Laravel-style MVC & Eloquent Active Record</p>
         </div>
+    <!-- Search Bar -->
+    <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+        <form method="GET" action="/products" class="flex gap-2">
+            <input type="text" name="q" value="<?= htmlspecialchars($q ?? '') ?>" placeholder="Search products..." class="flex-1 px-4 py-2 border rounded-lg">
+            <button type="submit" class="px-4 py-2 bg-slate-800 text-white rounded-lg">Search</button>
+            <?php if(!empty($q)): ?><a href="/products" class="px-4 py-2 bg-slate-200 rounded-lg">Clear</a><?php endif; ?>
+        </form>
+    </div>
     <!-- Search Bar -->
     <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
         <form method="GET" action="/products" class="flex gap-2">
@@ -319,7 +343,6 @@ SESSION['user_name']) ?></span>
         </div>
     <?php endif; ?>
 </div>
-
 
 
 
