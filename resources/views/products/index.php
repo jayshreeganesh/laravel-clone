@@ -4,6 +4,16 @@
             <h1 class="text-2xl font-bold text-slate-800">Products Catalog</h1>
             <p class="text-sm text-slate-500 mt-1">Laravel-style MVC & Eloquent Active Record</p>
         </div>
+        <div class="flex gap-2">
+            <?php if(isset($_SESSION['user_id'])): ?>
+                <span class="px-4 py-2 text-sm text-slate-600 font-bold bg-slate-100 rounded-lg">Welcome, <?= htmlspecialchars($_SESSION['user_name']) ?></span>
+                <a href="/logout" class="inline-flex items-center px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-medium rounded-lg shadow-sm transition">Logout</a>
+            <?php else: ?>
+                <a href="/login" class="inline-flex items-center px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-sm font-medium rounded-lg shadow-sm transition">Login</a>
+                <a href="/register" class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm transition">Register</a>
+            <?php endif; ?>
+        </div>
+    </div>
     <!-- Search Bar -->
     <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
         <form method="GET" action="/products" class="flex gap-2">
