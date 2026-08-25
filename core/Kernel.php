@@ -54,12 +54,12 @@ class Database {
 class Request {
     public function __construct() {
         if (session_status() === PHP_SESSION_NONE) { session_start(); }
-        if (empty($_SESSION['csrf_token'])) {
-            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        if (empty($_SESSION['__token'])) {
+            $_SESSION['__token'] = bin2hex(random_bytes(32));
         }
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $token = $_POST['csrf_token'] ?? '';
-            if (!hash_equals($_SESSION['csrf_token'], $token)) {
+            $token = $_POST['_token'] ?? $_POST['csrf_token'] ?? '';
+            if (!hash_equals($_SESSION['__token'], $token)) {
                 die('CSRF token validation failed.');
             }
         }
