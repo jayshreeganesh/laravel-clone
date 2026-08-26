@@ -13,5 +13,22 @@ class Product extends Model {
         'price',
         'stock',
         'description',
+        'is_active',
     ];
+    
+    public function delete(): bool {
+        $pdo = \App\Core\Database::connect();
+        $stmt = $pdo->prepare("UPDATE {$this->table} SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?");
+        return $stmt->execute([$this->attributes['id']]);
+    }
+
+    public function forceDelete(): bool {
+        return parent::delete();
+    }
+
+    public function restore(): bool {
+        $pdo = \App\Core\Database::connect();
+        $stmt = $pdo->prepare("UPDATE {$this->table} SET deleted_at = NULL WHERE id = ?");
+        return $stmt->execute([$this->attributes['id']]);
+    }
 }

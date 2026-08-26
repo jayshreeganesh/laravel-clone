@@ -20,29 +20,32 @@ class ProductController extends Controller {
     }
 
     public function index() {
-        $q = $_GET['q'] ?? '';
-        $sort = $_GET['sort'] ?? 'id';
-        $dir = $_GET['dir'] ?? 'desc';
-        $pdo = Database::connect();
-        
-        if (($_SESSION['role'] ?? 'user') === 'admin') {
-            $stmt = $pdo->prepare("SELECT * FROM products WHERE name LIKE ? OR sku LIKE ? OR description LIKE ? ORDER BY $sort $dir");
-            $stmt->execute(["%$q%", "%$q%", "%$q%"]);
-        } else {
-            $stmt = $pdo->prepare("SELECT * FROM products WHERE user_id = ? AND (name LIKE ? OR sku LIKE ? OR description LIKE ?) ORDER BY $sort $dir");
-            $stmt->execute([$_SESSION['user_id'], "%$q%", "%$q%", "%$q%"]);
-        }
-        
-        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        $products = [];
-        foreach ($rows as $row) {
-            $products[] = new \App\Models\Product($row);
-        }
-        
-        return view('products.index', compact('products', 'q', 'sort', 'dir'));
-    }
+    $q = $_GET['q'] ?? '';
+    $sort = $_GET['sort'] ?? 'id';
+    $dir = $_GET['dir'] ?? 'desc';
+    $trash = isset($_GET['trash']) ? (bool)$_GET['trash'] : false;
+    
+    $pdo = Database::connect();
+    
+    $trashCondition = $trash ? "products.deleted_at IS NOT NULL" : "products.deleted_at IS NULL";
 
-    public function show(int $id) {
+    if (($_SESSION['role'] ?? 'user') === 'admin') {
+        $stmt = $pdo->prepare("SELECT products.*, users.email as creator_email FROM products LEFT JOIN users ON products.user_id = users.id WHERE $trashCondition AND (products.name LIKE ? OR products.sku LIKE ? OR products.description LIKE ?) ORDER BY $sort $dir");
+        $stmt->execute(["%$q%", "%$q%", "%$q%"]);
+    } else {
+        $stmt = $pdo->prepare("SELECT * FROM products WHERE user_id = ? AND $trashCondition AND (name LIKE ? OR sku LIKE ? OR description LIKE ?) ORDER BY $sort $dir");
+        $stmt->execute([$_SESSION['user_id'], "%$q%", "%$q%", "%$q%"]);
+    }
+    
+    $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    $products = [];
+    foreach ($rows as $row) {
+        $products[] = new \App\Models\Product($row);
+    }
+    
+    return view('products.index', compact('products', 'q', 'sort', 'dir', 'trash'));
+}
+public function show(int $id) {
         $product = Product::findOrFail($id);
         if (($_SESSION['role'] ?? 'user') !== 'admin' && $product->user_id != $_SESSION['user_id']) { return redirect('/products'); }
         return view('products.show', compact('product'));
@@ -98,7 +101,7 @@ class ProductController extends Controller {
         return redirect('/products');
     }
 
-    public function destroy(int $id) {
+        public function destroy(int $id) {
         $product = Product::find($id);
         if ($product) {
             if (($_SESSION['role'] ?? 'user') !== 'admin' && $product->user_id != $_SESSION['user_id']) { return redirect('/products'); }
@@ -107,7 +110,41 @@ class ProductController extends Controller {
         return redirect('/products');
     }
 
-    public function export() {
+    public function forceDelete(int $id) {
+        $product = Product::find($id);
+        if ($product) {
+            if (($_SESSION['role'] ?? 'user') !== 'admin' && $product->user_id != $_SESSION['user_id']) { return redirect('/products'); }
+            $product->forceDelete();
+        }
+        return redirect('/products?trash=1');
+    }
+
+    public function restore(int $id) {
+        $product = Product::find($id);
+        if ($product) {
+            if (($_SESSION['role'] ?? 'user') !== 'admin' && $product->user_id != $_SESSION['user_id']) { return redirect('/products'); }
+            $product->restore();
+        }
+        return redirect('/products?trash=1');
+    }
+
+    public function toggleActive(int $id) {
+        $product = Product::find($id);
+        if ($product) {
+            if (($_SESSION['role'] ?? 'user') !== 'admin' && $product->user_id != $_SESSION['user_id']) { return redirect('/products'); }
+            $pdo = Database::connect();
+            $newStatus = $product->is_active ? 0 : 1;
+            $stmt = $pdo->prepare("UPDATE products SET is_active = ? WHERE id = ?");
+            $stmt->execute([$newStatus, $id]);
+        }
+        return redirect('/products');
+    }
+            $product->delete();
+        }
+        return redirect('/products');
+    }
+
+        public function export() {
         if (session_status() === PHP_SESSION_NONE) { session_start(); }
         if (!isset($_SESSION['user_id'])) {
             header('Location: /login');
@@ -115,13 +152,16 @@ class ProductController extends Controller {
         }
 
         $q = $_GET['q'] ?? '';
+        $trash = isset($_GET['trash']) ? (bool)$_GET['trash'] : false;
         $pdo = Database::connect();
         
+        $trashCondition = $trash ? "products.deleted_at IS NOT NULL" : "products.deleted_at IS NULL";
+
         if (($_SESSION['role'] ?? 'user') === 'admin') {
-            $stmt = $pdo->prepare("SELECT * FROM products WHERE name LIKE ? OR sku LIKE ? OR description LIKE ? ORDER BY id DESC");
+            $stmt = $pdo->prepare("SELECT products.*, users.email as creator_email FROM products LEFT JOIN users ON products.user_id = users.id WHERE $trashCondition AND (products.name LIKE ? OR products.sku LIKE ? OR products.description LIKE ?) ORDER BY id DESC");
             $stmt->execute(["%$q%", "%$q%", "%$q%"]);
         } else {
-            $stmt = $pdo->prepare("SELECT * FROM products WHERE user_id = ? AND (name LIKE ? OR sku LIKE ? OR description LIKE ?) ORDER BY id DESC");
+            $stmt = $pdo->prepare("SELECT * FROM products WHERE user_id = ? AND $trashCondition AND (name LIKE ? OR sku LIKE ? OR description LIKE ?) ORDER BY id DESC");
             $stmt->execute([$_SESSION['user_id'], "%$q%", "%$q%", "%$q%"]);
         }
         

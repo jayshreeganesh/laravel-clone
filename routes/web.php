@@ -22,4 +22,7 @@ Route::get('/products/{id}', [ProductController::class, 'show'])->name('products
 Route::get('/products/{id}/edit', [ProductController::class, 'edit'])->name('products.edit');
 Route::post('/products/{id}', [ProductController::class, 'update'])->name('products.update');
 Route::post('/products/{id}/delete', [ProductController::class, 'destroy'])->name('products.destroy');
+Route::post('/products/{id}/force-delete', [ProductController::class, 'forceDelete'])->name('products.forceDelete');
+Route::post('/products/{id}/restore', [ProductController::class, 'restore'])->name('products.restore');
+Route::post('/products/{id}/toggle-active', [ProductController::class, 'toggleActive'])->name('products.toggleActive');
 
