@@ -2,7 +2,8 @@
 session_start();
 
 // If already installed, block access (delete install.lock to re-setup)
-if (file_exists(__DIR__ . '/install.lock')) {
+// Allow step=3 through so the success page can display after install
+if (file_exists(__DIR__ . '/install.lock') && ($_GET['step'] ?? '') != '3') {
     echo '<h2 style="font-family:sans-serif;text-align:center;margin-top:100px;">Already installed. Delete <code>install.lock</code> to re-run setup.</h2>';
     exit;
 }
