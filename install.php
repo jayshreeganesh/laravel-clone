@@ -1,6 +1,12 @@
 <?php
 session_start();
 
+// If already installed, block access (delete install.lock to re-setup)
+if (file_exists(__DIR__ . '/install.lock')) {
+    echo '<h2 style="font-family:sans-serif;text-align:center;margin-top:100px;">Already installed. Delete <code>install.lock</code> to re-run setup.</h2>';
+    exit;
+}
+
 $configFile = __DIR__ . '/config/database.php';
 
 // Step Routing
@@ -63,6 +69,9 @@ return [
 ];
 ";
         file_put_contents($configFile, $configContent);
+
+        // Create lock file to mark installation as complete
+        file_put_contents(__DIR__ . '/install.lock', 'Installed on ' . date('Y-m-d H:i:s'));
 
         header("Location: /install.php?step=3");
         exit;

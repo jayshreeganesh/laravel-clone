@@ -9,44 +9,8 @@ if (!defined('LARAVEL_ROOT')) {
     define('LARAVEL_ROOT', dirname(__DIR__));
 }
 
-// Auto-detect if app needs installation
-$configFile = LARAVEL_ROOT . '/config/database.php';
-$needsInstall = false;
-
-if (!file_exists($configFile)) {
-    $needsInstall = true;
-} else {
-    $cfg = require $configFile;
-    if (empty($cfg['connections'])) {
-        $needsInstall = true;
-    } else {
-        // Quick check: can we connect and do tables exist?
-        try {
-            $default = $cfg['default'] ?? 'sqlite';
-            $db = $cfg['connections'][$default];
-            if ($default === 'sqlite') {
-                $dbPath = $db['database'] ?? '';
-                if (!file_exists($dbPath)) { $needsInstall = true; }
-                else {
-                    $pdo = new PDO('sqlite:' . $dbPath);
-                    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                    $check = $pdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name='users'");
-                    if ($check->fetchColumn() === false) { $needsInstall = true; }
-                }
-            } else {
-                $dsn = "mysql:host={$db['host']};port={$db['port']};dbname={$db['database']};charset=utf8mb4";
-                $pdo = new PDO($dsn, $db['username'], $db['password']);
-                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                $check = $pdo->query("SHOW TABLES LIKE 'users'");
-                if ($check->rowCount() === 0) { $needsInstall = true; }
-            }
-        } catch (Exception $e) {
-            $needsInstall = true;
-        }
-    }
-}
-
-if ($needsInstall) {
+// Lock file check: redirect to installer if not yet installed
+if (!file_exists(LARAVEL_ROOT . '/install.lock')) {
     $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
     if (strpos($uri, 'install.php') === false) {
         header('Location: /install.php');

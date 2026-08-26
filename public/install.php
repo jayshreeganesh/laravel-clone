@@ -1,7 +1,13 @@
 <?php
 session_start();
 
-$configFile = __DIR__ . '/../config/database.php';
+// If already installed, block access (delete install.lock to re-setup)
+if (file_exists(__DIR__ . '/install.lock')) {
+    echo '<h2 style="font-family:sans-serif;text-align:center;margin-top:100px;">Already installed. Delete <code>install.lock</code> to re-run setup.</h2>';
+    exit;
+}
+
+$configFile = __DIR__ . '/config/database.php';
 
 // Step Routing
 $step = $_GET['step'] ?? 1;
@@ -16,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $step == 2) {
 
     try {
         if ($driver === 'sqlite') {
-            $path = __DIR__ . '/../database/database.sqlite';
+            $path = __DIR__ . '/database/database.sqlite';
             if (!file_exists($path)) { touch($path); }
             $pdo = new PDO("sqlite:" . $path);
         } else {
@@ -39,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $step == 2) {
         $pdo->exec("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT UNIQUE, password TEXT, role TEXT DEFAULT 'user')");
 
         // Save Config
-        if (!is_dir(__DIR__ . '/../config')) { mkdir(__DIR__ . '/../config'); }
+        if (!is_dir(__DIR__ . '/config')) { mkdir(__DIR__ . '/config'); }
         $configContent = "<?php
 return [
     'default' => '$driver',
@@ -63,6 +69,9 @@ return [
 ];
 ";
         file_put_contents($configFile, $configContent);
+
+        // Create lock file to mark installation as complete
+        file_put_contents(__DIR__ . '/install.lock', 'Installed on ' . date('Y-m-d H:i:s'));
 
         header("Location: /install.php?step=3");
         exit;
