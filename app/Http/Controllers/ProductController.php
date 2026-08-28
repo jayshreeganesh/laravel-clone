@@ -139,12 +139,7 @@ public function show(int $id) {
         }
         return redirect('/products');
     }
-            $product->delete();
-        }
-        return redirect('/products');
-    }
-
-        public function export() {
+    public function export() {
         if (session_status() === PHP_SESSION_NONE) { session_start(); }
         if (!isset($_SESSION['user_id'])) {
             header('Location: /login');
